@@ -1,42 +1,47 @@
 package com.example.task_service.controller;
 
 
+import com.example.task_service.client.UserClient;
 import com.example.task_service.dto.TaskRequest;
+import com.example.task_service.dto.UserResponse;
+import com.example.task_service.entity.Task;
 import com.example.task_service.service.TaskService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
+import java.util.List;
 
 
 @RestController
 @RequestMapping("/tasks")
 public class TaskController {
 
-    @Autowired
-    private TaskService taskService;
+    private final TaskService taskService;
+    private final UserClient userClient;
 
-    // We'll pass the userId as a header for now.
-    // In a real advanced setup, this would be extracted from the JWT.
-    @PostMapping
-    public ResponseEntity<?> createTask(@RequestBody TaskRequest taskRequest, Principal principal) {
-        // The 'principal.getName()' will give us the user's email from the JWT
-        String userEmail = principal.getName();
-
-        // **Problem to solve next**: We have the email, but our service needs the user ID.
-        // For now, we'll just log it to prove security is working.
-        System.out.println("Creating task for user: " + userEmail);
-
-        // We will implement the logic to get userId from userEmail in the next step.
-        // For now, we can't create the task.
-        return ResponseEntity.ok("Security works! Task creation for " + userEmail + " needs userId lookup.");
+    public TaskController(TaskService taskService, UserClient userClient) {
+        this.taskService = taskService;
+        this.userClient = userClient;
     }
 
-    @GetMapping
-    public ResponseEntity<?> getUserTasks(Principal principal) {
+    @PostMapping("/create")
+    public ResponseEntity<Task> createTask(@RequestBody TaskRequest taskRequest, Principal principal) {
         String userEmail = principal.getName();
-        System.out.println("Fetching tasks for user: " + userEmail);
-        return ResponseEntity.ok("Security works! Task fetching for " + userEmail + " needs userId lookup.");
+
+        // Use the Feign client to call the User Service and get user details
+        UserResponse user = userClient.getUserByEmail(userEmail);
+
+        // Now we have the userId!
+        Task createdTask = taskService.createTask(taskRequest, user.getId());
+        return new ResponseEntity<>(createdTask, HttpStatus.CREATED);
     }
 
+    @GetMapping("/get")
+    public ResponseEntity<List<Task>> getUserTasks(Principal principal) {
+        String userEmail = principal.getName();
+        UserResponse user = userClient.getUserByEmail(userEmail);
+        List<Task> tasks = taskService.getTasksByUserId(user.getId());
+        return ResponseEntity.ok(tasks);
+    }
 }

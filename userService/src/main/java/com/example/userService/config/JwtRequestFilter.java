@@ -1,26 +1,25 @@
-package com.example.task_service.config;
+package com.example.userService.config;
 
 
-import com.example.task_service.service.JwtUtil;
-import com.example.task_service.service.UserDetailsServiceImpl;
+
+import com.example.userService.service.JwtUtil;
+import com.example.userService.service.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+
 import java.io.IOException;
 
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
-
 
     private final UserDetailsServiceImpl userDetailsService;
     private final JwtUtil jwtUtil;
@@ -36,25 +35,36 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         final String authorizationHeader = request.getHeader("Authorization");
 
+        // --- ADD THIS LOG ---
+        System.out.println("--- USER-SERVICE FILTER: Checking request to " + request.getRequestURI() + " ---");
+        System.out.println("--- USER-SERVICE FILTER: Auth Header: " + authorizationHeader + " ---");
+
         String username = null;
         String jwt = null;
 
-        // Extract the token from the "Bearer " header
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer")) {
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             jwt = authorizationHeader.substring(7);
-            username = jwtUtil.extractUsername(jwt);
+            try {
+                username = jwtUtil.extractUsername(jwt);
+                // --- ADD THIS LOG ---
+                System.out.println("--- USER-SERVICE FILTER: Extracted username: " + username + " ---");
+            } catch (Exception e) {
+                System.out.println("--- USER-SERVICE FILTER: Error extracting username: " + e.getMessage() + " ---");
+            }
         }
 
-        // If we have a username and the user is not already authenticated...
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-            // ...validate the token
             if (jwtUtil.validateToken(jwt, userDetails)) {
-                // If the token is valid, set the user's identity in the security context
+                // --- ADD THIS LOG ---
+                System.out.println("--- USER-SERVICE FILTER: Token is valid. Setting security context. ---");
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+            } else {
+                // --- ADD THIS LOG ---
+                System.out.println("--- USER-SERVICE FILTER: Token validation failed! ---");
             }
         }
         chain.doFilter(request, response);
