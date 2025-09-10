@@ -1,38 +1,17 @@
-package com.example.task_service.entity;
+package com.example.task_service.dto;
 
-import jakarta.persistence.*;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import com.example.task_service.entity.Priority;
 
 import java.time.LocalDateTime;
 
-@Entity
-@Data
-@RequiredArgsConstructor
-public class Task {
+public class TaskResponse {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private Long userId;
     private String title;
     private String description;
-    private String status;
-
-    public Priority getPriority() {
-        return priority;
-    }
-
-    public void setPriority(Priority priority) {
-        this.priority = priority;
-    }
-
-    @Enumerated(EnumType.STRING)
     private Priority priority;
-
+    private String status;
     private LocalDateTime dueDateTime;
-
 
     public Long getId() {
         return id;
@@ -40,14 +19,6 @@ public class Task {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
     }
 
     public String getTitle() {
@@ -66,6 +37,14 @@ public class Task {
         this.description = description;
     }
 
+    public Priority getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Priority priority) {
+        this.priority = priority;
+    }
+
     public String getStatus() {
         return status;
     }
@@ -81,5 +60,5 @@ public class Task {
     public void setDueDateTime(LocalDateTime dueDateTime) {
         this.dueDateTime = dueDateTime;
     }
-
 }
+

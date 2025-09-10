@@ -3,10 +3,9 @@ package com.example.task_service.controller;
 
 import com.example.task_service.client.UserClient;
 import com.example.task_service.dto.TaskRequest;
+import com.example.task_service.dto.TaskResponse;
 import com.example.task_service.dto.UserResponse;
-import com.example.task_service.entity.Task;
 import com.example.task_service.service.TaskService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
@@ -26,22 +25,44 @@ public class TaskController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Task> createTask(@RequestBody TaskRequest taskRequest, Principal principal) {
+    public ResponseEntity<TaskResponse> createTask(@RequestBody TaskRequest taskRequest, Principal principal) {
         String userEmail = principal.getName();
 
         // Use the Feign client to call the User Service and get user details
         UserResponse user = userClient.getUserByEmail(userEmail);
 
         // Now we have the userId!
-        Task createdTask = taskService.createTask(taskRequest, user.getId());
-        return new ResponseEntity<>(createdTask, HttpStatus.CREATED);
+        TaskResponse createdTask = taskService.createTask(taskRequest, user.getId());
+        return ResponseEntity.ok(createdTask);
     }
 
     @GetMapping("/get")
-    public ResponseEntity<List<Task>> getUserTasks(Principal principal) {
+    public ResponseEntity<List<TaskResponse>> getUserTasks(Principal principal) {
         String userEmail = principal.getName();
         UserResponse user = userClient.getUserByEmail(userEmail);
-        List<Task> tasks = taskService.getTasksByUserId(user.getId());
+        List<TaskResponse> tasks = taskService.getTasksByUserId(user.getId());
         return ResponseEntity.ok(tasks);
     }
+
+    //TODO ERROR HERE
+    @PutMapping("/update/{taskId}")
+    public ResponseEntity<TaskResponse> updateTask(Principal principal , @PathVariable Long taskId , @RequestBody TaskRequest taskRequest)
+    {
+        TaskResponse updatedTask = taskService.updateTask(getUserId(principal),taskId,taskRequest);
+        return ResponseEntity.ok(updatedTask);
+    }
+
+    @DeleteMapping("/delete/{taskId}")
+    public ResponseEntity<Void> deleteTask(@PathVariable Long taskId, Principal principal) {
+        taskService.deleteTask(taskId, getUserId(principal));
+        return ResponseEntity.noContent().build();
+    }
+
+
+    private Long getUserId(Principal principal) {
+        String userEmail = principal.getName();
+        UserResponse user = userClient.getUserByEmail(userEmail);
+        return user.getId();
+    }
+
 }
