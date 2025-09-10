@@ -44,7 +44,6 @@ public class TaskController {
         return ResponseEntity.ok(tasks);
     }
 
-    //TODO ERROR HERE
     @PutMapping("/update/{taskId}")
     public ResponseEntity<TaskResponse> updateTask(Principal principal , @PathVariable Long taskId , @RequestBody TaskRequest taskRequest)
     {
@@ -57,7 +56,6 @@ public class TaskController {
         taskService.deleteTask(taskId, getUserId(principal));
         return ResponseEntity.noContent().build();
     }
-
 
     private Long getUserId(Principal principal) {
         String userEmail = principal.getName();
