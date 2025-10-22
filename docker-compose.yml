@@ -5,7 +5,7 @@ services:
       - "8761:8761"
 
   user-service:
-    build: ./userService
+    build: ./user-service
     ports:
       - "8081:8081"
     environment:
@@ -32,3 +32,15 @@ services:
       - eureka-server
       - user-service
       - task-service
+      - collaboration-service
+
+  collaboration-service:
+    build: ./collaboration-service
+    ports:
+      - "8085:8085"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAILTZONE=http://eureka-server:8761/eureka/
+      - JWT_SECRET= sollalullaviraiiilaawetatulhulevalapaaamhdddbhddddbhd
+    depends_on:
+      - eureka-server
+      - user-service

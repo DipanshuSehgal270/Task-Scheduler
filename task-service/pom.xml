@@ -25,10 +25,6 @@
 		<tag/>
 		<url/>
 	</scm>
-<!--	<properties>-->
-<!--		<java.version>17</java.version>-->
-<!--		<spring-cloud.version>2025.0.0</spring-cloud.version>-->
-<!--	</properties>-->
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -51,6 +47,15 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
 		</dependency>
+
+<!--		this one below is spring feign with reactor which is non-blocking in nature-->
+<!--		<dependency>-->
+<!--			<groupId>com.playtika.reactivefeign</groupId>-->
+<!--			<artifactId>feign-reactor-spring-cloud-starter</artifactId>-->
+<!--			<version>3.2.6</version> &lt;!&ndash; version may vary &ndash;&gt;-->
+<!--		</dependency>-->
+
+<!--		the below is default spring openfeign which is blocking in nature.-->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-openfeign</artifactId>
@@ -96,17 +101,6 @@
             <artifactId>spring-web</artifactId>
         </dependency>
     </dependencies>
-<!--	<dependencyManagement>-->
-<!--		<dependencies>-->
-<!--			<dependency>-->
-<!--				<groupId>org.springframework.cloud</groupId>-->
-<!--				<artifactId>spring-cloud-dependencies</artifactId>-->
-<!--				<version>${spring-cloud.version}</version>-->
-<!--				<type>pom</type>-->
-<!--				<scope>import</scope>-->
-<!--			</dependency>-->
-<!--		</dependencies>-->
-<!--	</dependencyManagement>-->
 
 	<build>
 		<plugins>

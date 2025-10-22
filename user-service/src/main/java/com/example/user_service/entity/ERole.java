@@ -1,0 +1,8 @@
+package com.example.user_service.entity;
+
+//THESE ARE THE GLOBAL APP ROLES OF A USER IN THE APP.
+//eg - AN USER HAVING COMPLETE CONTROL OF THE APP IS THE ADMIN WITH ROLE-ADMIN.
+
+public enum ERole {
+    ROLE_USER , ROLE_LEADER , ROLE_ADMIN
+}

@@ -22,6 +22,8 @@ public class CollaborationService {
     @Autowired
     private ModelMapper modelMapper;
 
+    //CRUD
+
     @Transactional
     public TaskListResponse createTaskList(TaskListRequest request, Long ownerId) {
         TaskList taskList = new TaskList();
@@ -37,4 +39,7 @@ public class CollaborationService {
 
         return modelMapper.map(savedTaskList, TaskListResponse.class);
     }
+
+
+
 }

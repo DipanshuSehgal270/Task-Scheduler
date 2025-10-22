@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 @EnableDiscoveryClient
 public class ApiGatewayApplication {
 
+	//TODO - RESOLVE MANUAL ROUTING OF USER-SERVICE AS AUTOMATIC ROUTING WORKS FINE
+
 	public static void main(String[] args) {
 		SpringApplication.run(ApiGatewayApplication.class, args);
 	}

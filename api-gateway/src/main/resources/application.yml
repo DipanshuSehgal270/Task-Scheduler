@@ -15,6 +15,42 @@ spring:
           enabled: true
           lower-case-service-id: true
 
+#    cloud:
+#      gateway:
+#        routes:
+#          # Rule for the User & Auth Service
+#          - id: user-service-route
+#            # uri: The destination for requests matching this rule.
+#            # "lb://" means "load-balanced". The gateway will ask Eureka for the location of "user-service".
+#            # It is a best practice to use lowercase service names in the URI.
+#            uri: lb://user-service
+#            # predicates: The condition for applying this rule.
+#            # "Path=/auth/**, /users/**" means: If the request path starts with /auth/ OR /users/, apply this rule.
+#            predicates:
+#              - Path=/auth/**, /users/**
+#
+#          # Rule for the Task Service
+#          - id: task-service-route
+#            uri: lb://task-service
+#            predicates:
+#              - Path=/tasks/**
+#
+#          # Rule for the Collaboration Service
+#          - id: collaboration-service-route
+#            uri: lb://collaboration-service
+#            predicates:
+#              - Path=/lists/**
+
+# actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        # This tells Actuator to make the "gateway" endpoint available via HTTP
+        include: gateway
+
+# This section is necessary for a local run, telling the gateway where to find Eureka
+
 eureka:
   client:
     service-url:

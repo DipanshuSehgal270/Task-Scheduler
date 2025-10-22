@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class TaskListResponse {
+
     private Long id;
     private String name;
     private Long ownerId;
@@ -31,4 +32,5 @@ public class TaskListResponse {
     public void setOwnerId(Long ownerId) {
         this.ownerId = ownerId;
     }
+
 }

@@ -26,7 +26,7 @@
         <!-- This is your "Table of Contents". List every single service folder here. -->
         <module>service-discovery</module>
         <module>api-gateway</module>
-        <module>userService</module>
+        <module>user-service</module>
         <module>task-service</module>
         <module>collaboration-service</module>
     </modules>

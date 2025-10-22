@@ -26,6 +26,9 @@ public class TaskListController {
     private Long getUserId(Principal principal) {
         String userEmail = principal.getName();
         UserResponse user = userClient.getUserByEmail(userEmail);
+
+//        ResponseEntity<UserResponse> userResponseResponseEntity = userClient.getUserByEmail(userEmail);
+//        UserResponse user = userResponseResponseEntity.getBody();
         return user.getId();
     }
 

@@ -19,6 +19,10 @@ public class Task {
     private String title;
     private String description;
     private String status;
+    @Enumerated(EnumType.STRING)
+    private Priority priority;
+
+    private LocalDateTime dueDateTime;
 
     public Priority getPriority() {
         return priority;
@@ -27,12 +31,6 @@ public class Task {
     public void setPriority(Priority priority) {
         this.priority = priority;
     }
-
-    @Enumerated(EnumType.STRING)
-    private Priority priority;
-
-    private LocalDateTime dueDateTime;
-
 
     public Long getId() {
         return id;

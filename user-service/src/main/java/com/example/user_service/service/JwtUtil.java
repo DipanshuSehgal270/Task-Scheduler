@@ -1,4 +1,4 @@
-package com.example.collaboration_service.service;
+package com.example.user_service.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -57,5 +57,4 @@ public class JwtUtil {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
     }
 }
-
 

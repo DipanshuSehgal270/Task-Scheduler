@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 // name = "user-service" must match the spring.application.name of the User Service
+//this openfeign is default of spring cloud and is blocking in nature.
 @FeignClient(name = "user-service" , configuration = FeignClientConfig.class)
 public interface UserClient {
 
