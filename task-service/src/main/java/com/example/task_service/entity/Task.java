@@ -15,10 +15,11 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long userId;
+    private Long tasklistId;
     private String title;
     private String description;
     private String status;
+
     @Enumerated(EnumType.STRING)
     private Priority priority;
 
@@ -41,11 +42,11 @@ public class Task {
     }
 
     public Long getUserId() {
-        return userId;
+        return tasklistId;
     }
 
     public void setUserId(Long userId) {
-        this.userId = userId;
+        this.tasklistId = userId;
     }
 
     public String getTitle() {

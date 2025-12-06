@@ -34,6 +34,17 @@ services:
       - task-service
       - collaboration-service
 
+  notification-service:
+    build: ./notification-service
+    ports:
+      - "8088:8088"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SPRING_RABBITMQ_HOST=rabbitmq # Must match the service name above
+    depends_on:
+      - eureka-server
+      - rabbitmq
+
   collaboration-service:
     build: ./collaboration-service
     ports:
@@ -44,3 +55,12 @@ services:
     depends_on:
       - eureka-server
       - user-service
+
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbitmq
+      RABBITMQ_DEFAULT_PASS: 1234

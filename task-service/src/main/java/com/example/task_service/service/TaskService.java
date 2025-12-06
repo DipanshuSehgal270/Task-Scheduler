@@ -1,5 +1,7 @@
 package com.example.task_service.service;
 
+import com.example.task_service.client.CollaborationClient;
+import com.example.task_service.client.UserClient;
 import com.example.task_service.dto.TaskRequest;
 import com.example.task_service.dto.TaskResponse;
 import com.example.task_service.entity.Task;
@@ -15,68 +17,77 @@ public class TaskService {
 
     private final TaskRepository taskRepository;
     private final ModelMapper modelMapper;
+    private final CollaborationClient collaborationClient;
+    private final UserClient userClient;
 
-    public TaskService(TaskRepository taskRepository,ModelMapper modelMapper) {
+    public TaskService(TaskRepository taskRepository, ModelMapper modelMapper, CollaborationClient collaborationClient, UserClient userClient) {
         this.taskRepository = taskRepository;
         this.modelMapper = modelMapper;
+        this.collaborationClient = collaborationClient;
+        this.userClient = userClient;
     }
 
-    public TaskResponse createTask(TaskRequest taskRequest, Long userId) {
+    public void checkPermission(Long tasklistId){
+        collaborationClient.checkMembership(tasklistId);
+    }
+
+    public TaskResponse createTask(TaskRequest taskRequest, Long tasklistId) {
+
+        checkPermission(tasklistId);
 
         //convert request to entity
         Task task = modelMapper.map(taskRequest, Task.class);
-        task.setUserId(userId);
+        task.setTasklistId(tasklistId);
         task.setStatus("PENDING");
 
         //save the task in repository
         Task savedTask = taskRepository.save(task);
 
         //convert entity to dto
-        TaskResponse response = modelMapper.map(savedTask , TaskResponse.class);
-        return response;
-
+        return modelMapper.map(savedTask , TaskResponse.class);
     }
 
-    public List<TaskResponse> getTasksByUserId(Long userId) {
-        return taskRepository.findByUserId(userId).stream()
+    public List<TaskResponse> getTasksByTaskListId(Long tasklistId) {
+
+        checkPermission(tasklistId);
+
+        return taskRepository.findByTasklistId(tasklistId).stream()
                 .map(task -> modelMapper.map(task, TaskResponse.class))
                 .collect(Collectors.toList());
     }
 
-    public TaskResponse getTaskById(Long taskId , Long userId)
+    public TaskResponse getTaskById(Long taskId)
     {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new TaskNotFoundException("Task not found..."));
-        if (!task.getUserId().equals(userId)) {
-            throw new TaskNotFoundException("Task not found...");
-        }
+        checkPermission(task.getTasklistId());
         return modelMapper.map(task, TaskResponse.class);
     }
 
-    public TaskResponse updateTask(Long userId , Long taskId , TaskRequest taskRequest)
+    public TaskResponse updateTask(Long tasklistId , Long taskId , TaskRequest taskRequest)
     {
-        Task fecthedTask = taskRepository.findById(taskId)
+        Task fetchedTask = taskRepository.findById(taskId)
                 .orElseThrow(() -> new TaskNotFoundException("Task not found..."));
-        if (!fecthedTask.getUserId().equals(userId)) {
-            throw new TaskNotFoundException("Task not found...");
-        }
+
+        checkPermission(fetchedTask.getTasklistId());
 
         // 2. Use Method 2: Update the fetched task with data from the request
-        modelMapper.map(taskRequest, fecthedTask);
+        modelMapper.map(taskRequest, fetchedTask);
 
         // 3. Save the updated task back to the database
-        Task updatedTask = taskRepository.save(fecthedTask);
+        Task updatedTask = taskRepository.save(fetchedTask);
 
         // 4. Convert the final entity to a response DTO and return it
         return modelMapper.map(updatedTask, TaskResponse.class);
     }
 
-    public void deleteTask(Long taskId, Long userId) {
+    public void deleteTask(Long taskId) {
+
         Task taskToDelete = taskRepository.findById(taskId)
                 .orElseThrow(() -> new TaskNotFoundException("Task not found with id: " + taskId));
-        if (!taskToDelete.getUserId().equals(userId)) {
-            throw new TaskNotFoundException("Task not found with id: " + taskId);
-        }
+
+        checkPermission(taskToDelete.getTasklistId());
+
         taskRepository.delete(taskToDelete);
     }
 

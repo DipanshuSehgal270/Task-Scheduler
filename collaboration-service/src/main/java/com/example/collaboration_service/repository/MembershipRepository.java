@@ -1,6 +1,7 @@
 package com.example.collaboration_service.repository;
 
 import com.example.collaboration_service.entity.Membership;
+import com.example.collaboration_service.entity.TaskListRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -17,4 +18,7 @@ public interface MembershipRepository extends JpaRepository<Membership, Long> {
     // Finds all membership records for a specific user.
     // This will be used to get all the lists a user is a member of.
     List<Membership> findByUserId(Long userId);
+
+    List<Membership> findByUserIdAndRole(Long userId , TaskListRole role);
+
 }

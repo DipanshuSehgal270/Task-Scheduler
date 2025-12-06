@@ -25,35 +25,41 @@ public class TaskController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<TaskResponse> createTask(@RequestBody TaskRequest taskRequest, Principal principal) {
-        String userEmail = principal.getName();
-
-        // Use the Feign client to call the User Service and get user details
-        UserResponse user = userClient.getUserByEmail(userEmail);
-
+    public ResponseEntity<TaskResponse> createTask(@RequestBody TaskRequest taskRequest) {
         // Now we have the userId!
-        TaskResponse createdTask = taskService.createTask(taskRequest, user.getId());
+        TaskResponse createdTask = taskService.createTask(taskRequest, taskRequest.getTaskListId());
         return ResponseEntity.ok(createdTask);
     }
 
-    @GetMapping("/get")
-    public ResponseEntity<List<TaskResponse>> getUserTasks(Principal principal) {
-        String userEmail = principal.getName();
-        UserResponse user = userClient.getUserByEmail(userEmail);
-        List<TaskResponse> tasks = taskService.getTasksByUserId(user.getId());
+
+    @GetMapping
+    public ResponseEntity<List<TaskResponse>> getTasksByList(
+            // We read the taskListId from a URL query parameter, e.g., /tasks?taskListId=101
+            @RequestParam Long taskListId)
+    {
+        List<TaskResponse> tasks = taskService.getTasksByTaskListId(taskListId);
         return ResponseEntity.ok(tasks);
     }
 
+    @GetMapping("/{taskId}")
+     public ResponseEntity<TaskResponse> getTaskById(@PathVariable Long taskId) {
+        System.out.println("--- DEVTOOLS TEST: Change detected! ---");
+         TaskResponse task = taskService.getTaskById(taskId); // Service would handle auth
+         return ResponseEntity.ok(task);
+     }
+
+     //TODO CHECK THIS
     @PutMapping("/update/{taskId}")
-    public ResponseEntity<TaskResponse> updateTask(Principal principal , @PathVariable Long taskId , @RequestBody TaskRequest taskRequest)
-    {
-        TaskResponse updatedTask = taskService.updateTask(getUserId(principal),taskId,taskRequest);
+    public ResponseEntity<TaskResponse> updateTask(@PathVariable Long tasklistid,
+                                                   @PathVariable Long taskId,
+                                                   @RequestBody TaskRequest taskRequest) {
+        TaskResponse updatedTask = taskService.updateTask(tasklistid , taskId, taskRequest);
         return ResponseEntity.ok(updatedTask);
     }
 
-    @DeleteMapping("/delete/{taskId}")
-    public ResponseEntity<Void> deleteTask(@PathVariable Long taskId, Principal principal) {
-        taskService.deleteTask(taskId, getUserId(principal));
+    @DeleteMapping("/{taskId}")
+    public ResponseEntity<Void> deleteTask(@PathVariable Long taskId) {
+        taskService.deleteTask(taskId);
         return ResponseEntity.noContent().build();
     }
 

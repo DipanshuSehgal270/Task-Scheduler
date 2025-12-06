@@ -19,12 +19,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // Disable CSRF protection, which is not needed for stateless REST APIs.
                 .csrf(AbstractHttpConfigurer::disable)
-
-                // Define our authorization rules.
                 .authorizeHttpRequests(auth -> auth
-                        // This rule states that EVERY request to this service must be authenticated.
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated()
                 )
 

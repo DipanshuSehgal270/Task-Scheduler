@@ -12,6 +12,15 @@ public class TaskRequest {
     private Priority priority;
     private LocalDateTime dueDateTime;
 
+    private Long taskListId;
+
+    public Long getTaskListId() {
+        return taskListId;
+    }
+    public void setTaskListId(Long taskListId) {
+        this.taskListId = taskListId;
+    }
+
     public Priority getPriority() {
         return priority;
     }
