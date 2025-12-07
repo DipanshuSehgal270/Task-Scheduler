@@ -30,3 +30,8 @@ spring:
 jwt:
   secret: sollalullaviraiiilaawetatulhulevalapaaamhdddbhddddbhd
 
+logging:
+  level:
+    root: INFO
+
+

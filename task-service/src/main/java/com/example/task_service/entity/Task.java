@@ -3,7 +3,7 @@ package com.example.task_service.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Entity
@@ -14,16 +14,13 @@ public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private Long tasklistId;
     private String title;
     private String description;
     private String status;
-
     @Enumerated(EnumType.STRING)
     private Priority priority;
-
-    private LocalDateTime dueDateTime;
+    private Instant dueDateTime;
 
     public Priority getPriority() {
         return priority;
@@ -73,11 +70,11 @@ public class Task {
         this.status = status;
     }
 
-    public LocalDateTime getDueDateTime() {
+    public Instant getDueDateTime() {
         return dueDateTime;
     }
 
-    public void setDueDateTime(LocalDateTime dueDateTime) {
+    public void setDueDateTime(Instant dueDateTime) {
         this.dueDateTime = dueDateTime;
     }
 
