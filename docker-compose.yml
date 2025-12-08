@@ -1,26 +1,9 @@
 services:
+
   eureka-server:
     build: ./service-discovery
     ports:
       - "8761:8761"
-
-  user-service:
-    build: ./user-service
-    ports:
-      - "8081:8081"
-    environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-    depends_on:
-      - eureka-server
-
-  task-service:
-    build: ./task-service
-    ports:
-      - "8082:8082"
-    environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-    depends_on:
-      - eureka-server
 
   api-gateway:
     build: ./api-gateway
@@ -34,33 +17,73 @@ services:
       - task-service
       - collaboration-service
 
-  notification-service:
-    build: ./notification-service
-    ports:
-      - "8088:8088"
-    environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-      - SPRING_RABBITMQ_HOST=rabbitmq # Must match the service name above
-    depends_on:
-      - eureka-server
-      - rabbitmq
-
-  collaboration-service:
-    build: ./collaboration-service
-    ports:
-      - "8085:8085"
-    environment:
-      - EUREKA_CLIENT_SERVICEURL_DEFAILTZONE=http://eureka-server:8761/eureka/
-      - JWT_SECRET= sollalullaviraiiilaawetatulhulevalapaaamhdddbhddddbhd
-    depends_on:
-      - eureka-server
-      - user-service
-
   rabbitmq:
     image: rabbitmq:3.12-management
     ports:
       - "5672:5672"
       - "15672:15672"
     environment:
-      RABBITMQ_DEFAULT_USER: rabbitmq
-      RABBITMQ_DEFAULT_PASS: 1234
+    # Use ${VARIABLE_NAME} syntax
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
+    networks:
+      - task-net
+
+  user-service:
+    build: ./user-service
+    ports:
+      - "8081:8081"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      # Inject the secret from the .env file
+      - JWT_SECRET=${JWT_SECRET_KEY}
+    depends_on:
+      - eureka-server
+    networks:
+      - task-net
+
+  task-service:
+    build: ./task-service
+    ports:
+      - "8082:8082"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      # Inject the same secret here
+      - JWT_SECRET=${JWT_SECRET_KEY}
+    depends_on:
+      - eureka-server
+      - collaboration-service
+    networks:
+      - task-net
+
+  collaboration-service:
+    build: ./collaboration-service
+    ports:
+      - "8084:8084"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - JWT_SECRET=${JWT_SECRET_KEY}
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      # Pass RabbitMQ creds to the app if needed (optional for guest)
+      - SPRING_RABBITMQ_USERNAME=${RABBITMQ_USER}
+      - SPRING_RABBITMQ_PASSWORD=${RABBITMQ_PASS}
+    depends_on:
+      - eureka-server
+      - rabbitmq
+    networks:
+      - task-net
+
+  notification-service:
+    build: ./notification-service
+    ports:
+      - "8085:8085"
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_USERNAME=${RABBITMQ_USER}
+      - SPRING_RABBITMQ_PASSWORD=${RABBITMQ_PASS}
+    depends_on:
+      - eureka-server
+      - rabbitmq
+    networks:
+      - task-net

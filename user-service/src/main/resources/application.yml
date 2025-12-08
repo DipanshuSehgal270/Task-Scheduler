@@ -19,16 +19,18 @@ spring:
     console:
       enabled: true
   datasource:
-    url: jdbc:h2:mem:userdb
-    driverClassName: org.h2.Driver
-    username: root
-    password: 1234
+    url: jdbc:mysql://localhost:3306/UserServiceDB?allowPublicKeyRetrieval=true&useSSL=false
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: update
 
 # JWT Secret Key
 jwt:
-  secret: sollalullaviraiiilaawetatulhulevalapaaamhdddbhddddbhd
+  secret: ${JWT_SECRET_KEY}
 
 logging:
   level:
