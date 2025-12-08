@@ -16,6 +16,7 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
+    // testing = http://localhost:8081/users/by-email?email=admin@gmail.com
     @GetMapping("/by-email")
     public ResponseEntity<UserResponse> getUserByEmail(@RequestParam String email) {
         return userRepository.findByEmail(email)
@@ -28,5 +29,4 @@ public class UserController {
                 })
                 .orElse(ResponseEntity.notFound().build());
     }
-
 }

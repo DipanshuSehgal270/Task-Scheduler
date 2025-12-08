@@ -69,3 +69,7 @@ springdoc:
         url: /task-service/v3/api-docs
       - name: collaboration-service
         url: /collaboration-service/v3/api-docs
+
+logging:
+  level:
+    root: ERROR

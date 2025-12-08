@@ -1,7 +1,10 @@
 package com.example.notification_service.dto;
 
+import org.springframework.context.annotation.Configuration;
+
 import java.io.Serializable;
 
+@Configuration
 public class InvitationEvent implements Serializable {
 
     private String userEmail;

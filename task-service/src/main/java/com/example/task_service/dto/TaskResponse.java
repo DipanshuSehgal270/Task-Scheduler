@@ -2,6 +2,7 @@ package com.example.task_service.dto;
 
 import com.example.task_service.entity.Priority;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 public class TaskResponse {
@@ -11,7 +12,7 @@ public class TaskResponse {
     private String description;
     private Priority priority;
     private String status;
-    private LocalDateTime dueDateTime;
+    private Instant dueDateTime;
 
     public Long getId() {
         return id;
@@ -53,11 +54,11 @@ public class TaskResponse {
         this.status = status;
     }
 
-    public LocalDateTime getDueDateTime() {
+    public Instant getDueDateTime() {
         return dueDateTime;
     }
 
-    public void setDueDateTime(LocalDateTime dueDateTime) {
+    public void setDueDateTime(Instant dueDateTime) {
         this.dueDateTime = dueDateTime;
     }
 }

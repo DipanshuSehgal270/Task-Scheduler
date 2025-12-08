@@ -37,7 +37,6 @@ public class AuthService {
         this.roleRepository = roleRepository;
     }
 
-
     public User registerUser(RegisterRequest registerRequest) {
         if (userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
             throw new RuntimeException("Error: Email is already in use!");

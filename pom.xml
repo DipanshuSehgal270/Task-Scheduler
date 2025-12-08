@@ -12,7 +12,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.3</version> <!-- Or your desired Spring Boot version -->
+        <version>3.3.3</version>
         <relativePath/>
     </parent>
 
@@ -23,7 +23,6 @@
 
 
     <modules>
-        <!-- This is your "Table of Contents". List every single service folder here. -->
         <module>service-discovery</module>
         <module>api-gateway</module>
         <module>user-service</module>

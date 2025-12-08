@@ -25,6 +25,7 @@ public class TaskListController {
         this.userClient = userClient;
     }
 
+    @GetMapping("/userID")
     private Long getUserId(Principal principal) {
         String userEmail = principal.getName();
         UserResponse user = userClient.getUserByEmail(userEmail);
