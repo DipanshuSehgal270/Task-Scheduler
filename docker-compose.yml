@@ -1,9 +1,50 @@
 services:
 
+  prometheus:
+    image: prom/prometheus:v2.47.2
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - task-net
+
+  loki:
+    image: grafana/loki:2.9.0
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - task-net
+
+  promtail:
+    image: grafana/promtail:2.9.0
+    volumes:
+      - ./promtail/promtail-config.yml:/etc/promtail/config.yml
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: -config.file=/etc/promtail/config.yml
+    depends_on:
+      - loki
+    networks:
+      - task-net
+
+  grafana:
+    image: grafana/grafana:10.2.0
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - loki
+    networks:
+      - task-net
+
   eureka-server:
     build: ./service-discovery
     ports:
       - "8761:8761"
+    networks:
+      - task-net
 
   api-gateway:
     build: ./api-gateway
@@ -16,6 +57,8 @@ services:
       - user-service
       - task-service
       - collaboration-service
+    networks:
+      - task-net
 
   rabbitmq:
     image: rabbitmq:3.12-management
@@ -23,9 +66,19 @@ services:
       - "5672:5672"
       - "15672:15672"
     environment:
-    # Use ${VARIABLE_NAME} syntax
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
+    networks:
+      - task-net
+
+  mysql:
+    image: mysql:8.0
+    ports:
+      - "3308:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ./mysql-init:/docker-entrypoint-initdb.d
     networks:
       - task-net
 
@@ -35,10 +88,13 @@ services:
       - "8081:8081"
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-      # Inject the secret from the .env file
       - JWT_SECRET=${JWT_SECRET_KEY}
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/user_db?allowPublicKeyRetrieval=true&useSSL=false
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
     depends_on:
       - eureka-server
+      - mysql
     networks:
       - task-net
 
@@ -48,11 +104,14 @@ services:
       - "8082:8082"
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
-      # Inject the same secret here
       - JWT_SECRET=${JWT_SECRET_KEY}
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/task_db?allowPublicKeyRetrieval=true&useSSL=false
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
     depends_on:
       - eureka-server
       - collaboration-service
+      - mysql
     networks:
       - task-net
 
@@ -64,12 +123,15 @@ services:
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
       - JWT_SECRET=${JWT_SECRET_KEY}
       - SPRING_RABBITMQ_HOST=rabbitmq
-      # Pass RabbitMQ creds to the app if needed (optional for guest)
       - SPRING_RABBITMQ_USERNAME=${RABBITMQ_USER}
       - SPRING_RABBITMQ_PASSWORD=${RABBITMQ_PASS}
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/collab_db?allowPublicKeyRetrieval=true&useSSL=false
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
     depends_on:
       - eureka-server
       - rabbitmq
+      - mysql
     networks:
       - task-net
 
@@ -87,3 +149,7 @@ services:
       - rabbitmq
     networks:
       - task-net
+
+networks:
+  task-net:
+    driver: bridge

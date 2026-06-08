@@ -46,8 +46,9 @@ management:
   endpoints:
     web:
       exposure:
-        # This tells Actuator to make the "gateway" endpoint available via HTTP
-        include: gateway
+        include: prometheus
+    prometheus:
+      enabled: true
 
 # This section is necessary for a local run, telling the gateway where to find Eureka
 

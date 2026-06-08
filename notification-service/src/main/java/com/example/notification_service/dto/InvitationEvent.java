@@ -10,8 +10,7 @@ public class InvitationEvent implements Serializable {
     private String userEmail;
     private Long taskListId;
 
-    public InvitationEvent() {
-    }
+    public InvitationEvent() {}
 
     public InvitationEvent(String userEmail, Long taskListId) {
         this.userEmail = userEmail;

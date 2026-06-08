@@ -21,8 +21,8 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/UserServiceDB?allowPublicKeyRetrieval=true&useSSL=false
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:1234}
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
@@ -30,10 +30,18 @@ spring:
 
 # JWT Secret Key
 jwt:
-  secret: ${JWT_SECRET_KEY}
+  secret: ${JWT_SECRET_KEY:enshgvnishgnciosehgcniesrgncoisegncvioysergnvciyesrognvcioyersgncioyesrgncreioygncosiyegncoieygniorh}
 
 logging:
   level:
     root: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
+    prometheus:
+      enabled: true
 
 
